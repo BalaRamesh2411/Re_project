@@ -1,0 +1,126 @@
+*{
+    margin: 0;
+    padding: 0;
+   
+}
+.mainContainer {
+  background-color: #4CAF50; 
+}
+ 
+  
+
+
+  @media (max-width: 991.98px) {
+    .navbar-collapse {
+      background-color: white; /* Change the background color to white */
+    }
+    .nav-link {
+      color: black !important; /* Ensure the text color is readable on white background */
+    }
+    .nav-link:hover {
+       color: #eb8181;
+    }
+    .navbar-toggler-icon {
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      background: no-repeat center center;
+      background-size: contain;
+      position: relative;
+    }
+    .navbar-toggler-icon:before,
+    .navbar-toggler-icon:after,
+    .navbar-toggler-icon span {
+      content: '';
+      display: block;
+      width: 24px;
+      height: 2px;
+      background-color: white; /* Make the menu bar white */
+      position: absolute;
+      left: 0;
+      transition: all 0.2s;
+    }
+    .navbar-toggler-icon:before {
+      top: 5px;
+    }
+    .navbar-toggler-icon:after {
+      bottom: 5px;
+    }
+    .navbar-toggler-icon span {
+      top: 50%;
+      transform: translateY(-50%);
+    }
+  }
+  
+ 
+  .navbar-toggler {
+    border: none;
+    outline: none; 
+    padding: 0;
+  }
+  
+  .navbar-toggler:focus {
+    outline: none; 
+  }
+
+
+  .nav-link.linkInNav.custom-nav-link {
+    color: #fff; /* Default link color */
+    transition: color 0.3s ease; /* Smooth transition for color change */
+  }
+  
+  /* Hover effect for the nav links */
+  .nav-link.linkInNav.custom-nav-link:hover {
+    color: #ffcc00; /* Change this to your desired hover color */
+  }
+  
+  /* Media query for screen sizes less than 992px */
+  @media (max-width: 991.98px) {
+    .navbar-collapse {
+      background-color: white; /* Change the background color to white */
+    }
+    .nav-link {
+      color: black !important; /* Ensure the text color is readable on white background */
+    }
+    .navbar-toggler-icon {
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      background: no-repeat center center;
+      background-size: contain;
+      position: relative;
+    }
+    .navbar-toggler-icon:before,
+    .navbar-toggler-icon:after,
+    .navbar-toggler-icon span {
+      content: '';
+      display: block;
+      width: 24px;
+      height: 2px;
+      background-color: white; /* Make the menu bar white */
+      position: absolute;
+      left: 0;
+      transition: all 0.2s;
+    }
+    .navbar-toggler-icon:before {
+      top: 5px;
+    }
+    .navbar-toggler-icon:after {
+      bottom: 5px;
+    }
+    .navbar-toggler-icon span {
+      top: 50%;
+      transform: translateY(-50%);
+    }
+  }
+  
+  /* Default .navbar-toggler styles for the menu bar */
+  .navbar-toggler {
+    border: none; /* Remove the default border */
+    outline: none; /* Remove the default outline */
+    padding: 0; /* Remove the default padding */
+  }
+  
+  .navbar-toggler:focus {
+    outline: none; /* Remove focus outline */
+  }
