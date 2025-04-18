@@ -33,31 +33,6 @@ class SuuperAdmin(db.Model):
     password = db.Column(db.String)
     status = db.Column(db.String)
 
-# @app.route('/createUser',methods=['POST'])
-# def createUser():
-#     datas =  request.form
-#     registerData = SuuperAdmin(userName = datas['userName'],email = datas['email'],password = datas['password'],status = datas['status'])
-#     db.session.add(registerData)
-#     db.session.commit()
-#     # return 'register successfully'
-#     return jsonify({
-#         'RegisterId': registerData.registerID,
-#         'Name': registerData.userName,
-#         'email': registerData.email,
-#         'password': registerData.password,
-#         'status': registerData.status
-#     })
-#     # registerDatas = SuuperAdmin.query.all()
-#     # return jsonify([
-#     #     {
-#     #         'RegisterId': data.registerID,
-#     #         'Name': data.userName,
-#     #         'email': data.email,
-#     #         'password': data.password,
-#     #         'status': data.status
-#     #     } for data in registerDatas
-#     # ])
-
 # Register
 @app.route('/createUser', methods=['POST'])
 def createUser():
@@ -117,19 +92,6 @@ def changeStatus(changeId):
     })
 
 
-# Login
-# @app.route('/log',methods=['POST'])
-# def loginUser():
-#     data = request.form
-#     loginData = SuuperAdmin.query.filter_by(email=data['emaildata'],password=data['passworddata']).first()
-#     tokendata = create_access_token(identity = data['emaildata'])
-
-#     if loginData is None:
-#         return "user is not found"
-
-
-#     return jsonify({'email':loginData.email,'userName':loginData.password,'token':tokendata,"status":loginData.status})
-
 @app.route('/log', methods=['POST'])
 def loginUser():
     data = request.form
@@ -158,22 +120,6 @@ class SetCategory(db.Model):
     categoryName = db.Column(db.String)
     registerID = db.Column(db.Integer,db.ForeignKey('superAdmin.registerID'))
 
-# POST CATEGORY
-# @app.route("/categoryList",methods=["GET","POST"])
-# @jwt_required()
-# def category():
-#     if request.method== "POST":
-#         categorydata=SetCategory(categoryName=request.form["categoryName"])
-#         db.session.add(categorydata)
-#         db.session.commit()
-#     # return "success"
-#     return jsonify({
-#         "categoryId":categorydata.categoryId,
-#         "categoryName":categorydata.categoryName,
-#         "registerID":categorydata.registerID,
-#         "msg":"success"
-#     })
-
 
 # POST CATEGORY
 @app.route("/categoryList", methods=["POST"])
@@ -197,14 +143,6 @@ def category():
     except Exception as e:
         return jsonify({"msg": "Failed", "error": str(e)}), 500
 
-# # GET CATEGORY
-# @app.route('/getCategory',methods = ["GET"])
-# @jwt_required()
-# def getCategory():
-#     getCategories = SetCategory.query.all()
-#     return jsonify([
-#                         {'categoryId':category.categoryId,'categoryName':category.categoryName} for category in getCategories
-#                     ])
 
 
 # GET particular CATEGORY
@@ -252,16 +190,6 @@ def addtype():
 
 
 
-# # GET TYPE
-# @app.route('/getType/<int:category_id>', methods=['GET'])
-# @jwt_required()
-# def getType(category_id):
-#     getTypes = SetType.query.filter_by(categoryId=category_id).all()
-#     return jsonify([
-#         {'typeId': typ.typeId, 'typeName': typ.typeName, 'categoryId': typ.categoryId} for typ in getTypes
-#     ])
-
-
 # DELETE TYPE
 @app.route("/deleteList/<int:typeId>",methods=["DELETE"])
 @jwt_required()
@@ -305,26 +233,77 @@ def postGeneratedData():
             "msg": "success"
         })
 
+
+
+
+
 # GET TEMPLATE
-@app.route('/getTemplate', methods = ['GET'])
+@app.route('/getTemplate/<int:typeId>', methods=['GET'])
 @jwt_required()
-def getTemplate():
-    getTemplates = SetTemplate.query.all()
-    return jsonify([
-                        {'categoryId':temp.categoryId,'typeId':temp.typeId,'generatedDataId':temp.generatedDataId,'datas':temp.datas,'template':temp.templates}
-                        for temp in getTemplates
-                    ])
-
-
-@app.route('/getParticulartUsetTemplate/<int:user_id>', methods=['GET'])
-def get_particular_user_template(user_id):
+def getTemplate(typeId):
     try:
-        templates = SetTemplate.query.filter_by(user_id=user_id).all()
-        data = [template.to_dict() for template in templates]
-        return jsonify({"status": "success", "templates": data}), 200
+        # Fetch templates matching typeId
+        getTemplates = SetTemplate.query.filter_by(typeId=typeId).all()
+
+        # Optional: Debug print
+        if not getTemplates:
+            print(f"No templates found for typeId {typeId}")
+            return jsonify([])
+
+        # Build response
+        response = []
+        for temp in getTemplates:
+            response.append({
+                'categoryId': temp.categoryId,
+                'typeId': temp.typeId,
+                'generatedDataId': temp.generatedDataId,
+                'datas': temp.datas,
+                'template': temp.templates
+            })
+
+        return jsonify(response)
+    
     except Exception as e:
-        print("Error in getParticulartUsetTemplate:", e)
-        return jsonify({"status": "error", "message": str(e)}), 500
+        print("Error fetching templates:", str(e))
+        return jsonify({"error": "Internal Server Error"}), 500
+
+
+
+# @app.route('/getParticularUserTemplate/<int:generatedDataId>', methods=['GET'])
+# def get_particular_user_template(generatedDataId):
+#     try:
+#         template = SetTemplate.query.filter_by(
+#             generatedDataId=generatedDataId
+#         ).first()
+
+#         if template is None:
+#             return jsonify({"error": "Template not found"}), 404
+
+#         return jsonify({
+#            'generatedDataId': template.generatedDataId,
+#         'datas': template.datas,
+#         'templates': template.templates
+#         })
+
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 500
+
+@app.route('/getSelectedTemplate/<int:template_id>/<int:user_id>', methods=['GET'])
+@jwt_required()
+def get_selected_template(template_id, user_id):
+    template = SetTemplate.query.filter_by(generatedDataId=template_id, register_id=user_id).first()
+    if template:
+        return jsonify({
+            "template_id":template.generatedDataId,
+            "status": "success",
+            "datas": template.datas,
+            "templates": template.templates
+        }), 200
+    else:
+        return jsonify({"status": "error", "message": "Template not found"}), 404
+
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

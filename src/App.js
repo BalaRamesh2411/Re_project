@@ -55,10 +55,10 @@ function App() {
         {adminLogged && (
           <>
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/user/setting" element ={<Categories/>}/>
             <Route path="/template" element={<Template />} />
             <Route path="/finalPage/:id/:currentLoginUserId" element={<FinalPage />} />
-           
-            <Route path="/user/setting" element ={<Categories/>}/>
+        
           </>
         )}
 

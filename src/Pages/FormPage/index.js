@@ -24,19 +24,24 @@ const FinalPage = () => {
   const localToken = localStorage.getItem("__token");
   const headers = { Authorization: `Bearer ${localToken}` };
 
-  const getData = async (i, user) => {
-    const dbTemplate = await axios
-      .get(
-        `http://127.0.0.1:5000/getSelectedTemplate/${i}/${user}`,
+  const getData = async (DataId, registerId) => {
+    try {
+      const res = await axios.get(
+        `http://127.0.0.1:5000/getSelectedTemplate/${DataId}/${registerId}`,
         { headers }
-      )
-      .then((res) => {
-        const parsedData = JSON.parse(res.data.datas);
-        dispatch(setDatas(parsedData));
-        dispatch(setSelectTemplate(res.data.templates))
-        console.log("parse", parsedData);
-      });
+      );
+      console.log("Template string from response:", res.data.template);
+      const parsedData = JSON.parse(res.data.datas);
+      dispatch(setDatas(parsedData));
+      dispatch(setSelectTemplate(res.data.templates));
+      console.log("Template string from response:", res.data.templates);
+
+    } catch (error) {
+      console.error("Error fetching template:", error);
+    }
   };
+
+
 
   const handleValueChange = (index, event) => {
     const newFormData = [...formData];
@@ -44,61 +49,93 @@ const FinalPage = () => {
     setFormData(newFormData);
     // console.log(newFormData)
   };
-  // console.log("formData", formData);
+  
 
   const handleClose = () => {
     setShow(false);
   };
-
+  // const handleFormSave = async () => {
+  //   if (!Array.isArray(datas)) {
+  //     alert("Template data is not loaded properly.");
+  //     return;
+  //   }
+  
+  //   setShow(true);
+  //   let newTemplates = selectTemplate;
+  
+  //   datas.forEach((pair, index) => {
+  //     const key = pair.key;
+  //     const value = formData[index] || "";
+  //     newTemplates = newTemplates.replace(
+  //       new RegExp(`\\[Enter ${key}\\]`, "g"),
+  //       value
+  //     );
+  //   });
+  
+  //   setTemplate(newTemplates);
+  // };
+  
   const handleFormSave = async () => {
+    if (!Array.isArray(datas)) {
+      alert("Template data is not loaded properly.");
+      return;
+    }
+  
+    if (!selectTemplate) {
+      alert("No template content found to populate.");
+      return;
+    }
+  
+    let newTemplates = selectTemplate;
+  
+    datas.forEach((pair, index) => {
+      const key = pair.key;
+      const value = formData[index] || "";
+      newTemplates = newTemplates.replace(
+        new RegExp(`\\[Enter ${key}\\]`, "g"),
+        value
+      );
+      console.log("newtemplate",newTemplates)
+    });
+  
+    setTemplate(newTemplates);
     setShow(true);
+  };
+  
 
-        const valueArray = datas.map((pair) => pair.value);
-        const keyArray = datas.map((pair) => pair.key);
-
-        console.log("valueArray", valueArray);
-        console.log("keyArray", keyArray);
-
-        let newTemplates = selectTemplate;
-
-        // console.log("paragraph",paragraph);
-
-        keyArray.forEach((key, index) => {
-          if (newTemplates.includes(key)) {
-            newTemplates = newTemplates.replace(
-              new RegExp(`\\[Enter ${key}\\]`, "g"),
-              `${formData[index]}`
-            );
-            setTemplate(newTemplates);
-          }
-        });
-  }
 
   useEffect(() => {
-    getData(id, currentLoginUserId);
+    console.log("Params:", id, currentLoginUserId); 
+    if (id && currentLoginUserId) {
+      getData(id, currentLoginUserId);
+    } else {
+      console.warn("Missing parameters in URL.");
+    }
   }, []);
-  // console.log("new gen", generateDatas);
-  const sendEmil = () => {
+  
+  
+  const sendEmil = (content) => {
     const data = {
       to_email: toEmail,
-      message: template,
+      message: content,
       subject: mailSubject,
     };
+  
     emailjs
       .send("service_lz71gf3", "template_nu02of7", data, "GEPKT28Xn5AU0p2vl")
       .then(
         (result) => {
           console.log("SUCCESS!", result.text);
-          alert("Email send successfull✔️");
+          alert("Email send successful ✔️");
           navigate("/template");
         },
         (error) => {
           console.log("FAILED...", error.text);
-          console.log("error", error);
-          alert("Email send failed❌");
+          alert("Email send failed ❌");
         }
       );
   };
+  
 
   return (
     <>
@@ -116,28 +153,24 @@ const FinalPage = () => {
         }}
       >
         <div className="row">
-          {datas.map((doc, index) => (
-            <FloatingLabel
-              controlId={`floatingInput${index}`}
-              key={index}
-              label={doc.key}
-              className="mb-3"
-              style={{
-                textTransform: "capitalize",
-                margin: "34px 0",
-              }}
-              required
-            > 
-              <Form.Control
+          {Array.isArray(datas) &&
+            datas.map((doc, index) => (
+              <FloatingLabel
+                controlId={`floatingInput${index}`}
+                key={index}
+                label={doc.key}
+                className="mb-3"
+                style={{ textTransform: "capitalize", margin: "34px 0" }}
                 required
-                placeholder={doc.key}
-                onChange={(event) => handleValueChange(index, event)}
-                style={{
-                  textTransform: "capitalize",
-                }}
-              />
-            </FloatingLabel>
-          ))}
+              >
+                <Form.Control
+                  required
+                  placeholder={doc.key}
+                  onChange={(event) => handleValueChange(index, event)}
+                  style={{ textTransform: "capitalize" }}
+                />
+              </FloatingLabel>
+            ))}
         </div>
         <Button type="button" variant="primary" onClick={handleFormSave}>
           Proceed
