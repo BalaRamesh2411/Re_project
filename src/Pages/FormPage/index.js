@@ -95,7 +95,7 @@ const FinalPage = () => {
         new RegExp(`\\[Enter ${key}\\]`, "g"),
         value
       );
-      console.log("newtemplate",newTemplates)
+      console.log("newtemplate  :",newTemplates)
     });
   
     setTemplate(newTemplates);
@@ -114,15 +114,15 @@ const FinalPage = () => {
   }, []);
   
   
-  const sendEmil = (content) => {
+  const handleSendEmail = (e) => {
     const data = {
       to_email: toEmail,
-      message: content,
+      body: template,
       subject: mailSubject,
     };
   
     emailjs
-      .send("service_lz71gf3", "template_nu02of7", data, "GEPKT28Xn5AU0p2vl")
+      .send("service_1yi66wh", "template_ef0hkoh", data, "UOYmshbcaVhSwPuBP")
       .then(
         (result) => {
           console.log("SUCCESS!", result.text);
@@ -222,7 +222,7 @@ const FinalPage = () => {
           <Button variant="secondary" onClick={handleClose}>
             Close
           </Button>
-          <Button variant="primary" onClick={() => sendEmil()}>
+          <Button variant="primary" onClick={handleSendEmail}>
             Send Email
           </Button>
         </Modal.Footer>
